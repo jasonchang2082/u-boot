@@ -217,15 +217,15 @@ static void lcd_drawchars (ushort x, ushort y, uchar *str, int count)
 	uchar *dest;
 	ushort off, row;
 
-	dest = (uchar *)(lcd_base + y * lcd_line_length + x * NBITS(LCD_BPP) / 8);
-	off  = x * NBITS(LCD_BPP) % 8;
+	dest = (uchar *)(lcd_base + y * lcd_line_length + x * (1 << LCD_BPP) / 8);
+	off  = x * (1 << LCD_BPP) % 8;
 
 	for (row=0;  row < VIDEO_FONT_HEIGHT;  ++row, dest += lcd_line_length)  {
 		uchar *s = str;
 		int i;
 #if LCD_BPP == LCD_COLOR16
 		ushort *d = (ushort *)dest;
-#elif LCD_BPP != LCD_COLOR32
+#else
 		uchar *d = dest;
 #endif
 
@@ -640,18 +640,17 @@ int lcd_display_bitmap(ulong bmp_image, int x, int y)
 
 	bpix = NBITS(panel_info.vl_bpix);
 
-	if ((bpix != 1) && (bpix != 8) && (bpix != 16) && (bpix != 24) && (bpix != 32)) {
+	if ((bpix != 1) && (bpix != 8) && (bpix != 16)) {
 		printf ("Error: %d bit/pixel mode, but BMP has %d bit/pixel\n",
 			bpix, bmp_bpix);
 		return 1;
 	}
 
-	/* We support displaying 8bpp BMPs on 16bpp LCDs
-	 * and 24 BMPs on 32bpp LCDs if they are enabled*/
-	if (bpix != bmp_bpix && (bmp_bpix != 8 || bpix != 16) &&
-	    (bmp_bpix != 24 || bpix != 32)) {
+	/* We support displaying 8bpp BMPs on 16bpp LCDs */
+	if (bpix != bmp_bpix && (bmp_bpix != 8 || bpix != 16)) {
 		printf ("Error: %d bit/pixel mode, but BMP has %d bit/pixel\n",
-			bpix, bmp_bpix);
+			bpix,
+			le16_to_cpu(bmp->header.bit_count));
 		return 1;
 	}
 
@@ -786,33 +785,6 @@ int lcd_display_bitmap(ulong bmp_image, int x, int y)
 		}
 		break;
 #endif /* CONFIG_BMP_16BPP */
-
-#if defined(CONFIG_BMP_24BPP)
-	case 24:
-		for (i = 0; i < height; ++i) {
-			WATCHDOG_RESET();
-			if (bpix == 24) {
-				for (j = 0; j < width; j++) {
-					*(fb++) = *(bmap++);
-					*(fb++) = *(bmap++);
-					*(fb++) = *(bmap++);
-				}
-				bmap += (padded_line - width) * 3;
-				fb   -= (width * 3 + lcd_line_length);
-			}
-			else if (bpix == 32) {
-				for (j = 0; j < width; j++) {
-					*(fb++) = *(bmap++);
-					*(fb++) = *(bmap++);
-					*(fb++) = *(bmap++);
-					*(fb++) = 0xFF;
-				}
-				bmap += (padded_line - width) * 3;
-				fb   -= (width * 4 + lcd_line_length);
-			}
-		}
-		break;
-#endif /* CONFIG_BMP_24BPP */
 
 	default:
 		break;

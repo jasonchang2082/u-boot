@@ -38,20 +38,14 @@
  * This array defines the layout of the Embedded Flash on the STM32 chips
  */
 static u32 flash_bsize[] = {
-#if defined(CONFIG_SYS_STM32F7)
-	[0 ... 3]	=  32 * 1024,
-	[4]		= 128 * 1024,
-	[5 ... 7]	= 256 * 1024,
-#else
 	[0 ... 3]	=  16 * 1024,
 	[4]		=  64 * 1024,
 	[5 ... 11]	= 128 * 1024
-# if defined(CONFIG_SYS_STM32F43X)
+#if defined(CONFIG_SYS_STM32F43X)
 	,
 	[12 ... 15]	=  16 * 1024,
 	[16]		=  64 * 1024,
 	[17 ... 23]	= 128 * 1024
-# endif
 #endif
 	};
 
@@ -267,7 +261,6 @@ stm32_flash_program(u32 offset, void *buf, u32 size)
 		while (STM32_FLASH_REGS->sr & STM32_FLASH_SR_BSY)
 			;
 	}
-
 	STM32_FLASH_REGS->cr &= ~STM32_FLASH_CR_PG;
 	stm32_flash_cr_lock();
 
@@ -318,9 +311,6 @@ envm_write(u32 offset, void * buf, u32 size)
 {
 	s32 ret = 0;
 
-#if defined(CONFIG_STM32F7_DCACHE_ON) || defined(CONFIG_STM32F7_ICACHE_ON)
-	stm32f7_envm_as_dev();
-#endif
 	/* Basic sanity check. More checking in the "get_block" routine */
 	if ((offset < STM32_FLASH_BASE) ||
 		((offset + size) > (STM32_FLASH_BASE + STM32_FLASH_SIZE))) {
@@ -336,8 +326,5 @@ envm_write(u32 offset, void * buf, u32 size)
 
 	ret = size;
 xit:
-#if defined(CONFIG_STM32F7_DCACHE_ON) || defined(CONFIG_STM32F7_ICACHE_ON)
-	stm32f7_envm_as_dev();
-#endif
 	return ret;
 }

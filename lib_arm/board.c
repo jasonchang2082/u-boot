@@ -280,7 +280,7 @@ void start_armboot (void)
 {
 	init_fnc_t **init_fnc_ptr;
 	char *s;
-#if defined(CONFIG_VFD) || (defined(CONFIG_LCD) && !defined(CONFIG_FB_ADDR))
+#if defined(CONFIG_VFD) || defined(CONFIG_LCD)
 	unsigned long addr;
 #endif
 
@@ -335,9 +335,6 @@ void start_armboot (void)
 #ifdef CONFIG_LCD
 	/* board init may have inited fb_base */
 	if (!gd->fb_base) {
-#ifdef CONFIG_FB_ADDR
-		gd->fb_base = CONFIG_FB_ADDR;
-#else
 #		ifndef PAGE_SIZE
 #		  define PAGE_SIZE 4096
 #		endif
@@ -348,7 +345,6 @@ void start_armboot (void)
 		addr = (_bss_end + (PAGE_SIZE - 1)) & ~(PAGE_SIZE - 1);
 		lcd_setmem (addr);
 		gd->fb_base = addr;
-#endif /* CONFIG_FB_ADDR */
 	}
 #endif /* CONFIG_LCD */
 

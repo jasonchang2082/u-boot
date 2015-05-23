@@ -63,9 +63,9 @@
 #define CONFIG_DISPLAY_BOARDINFO	1
 
 #if CONFIG_SYS_BOARD_REV == 0x2A
-# define CONFIG_SYS_BOARD_REV_STR	"2.A"
+# define CONFIG_SYS_BOARD_REV_STR	"Rev 2.A"
 #elif CONFIG_SYS_BOARD_REV == 0x1A
-# define CONFIG_SYS_BOARD_REV_STR	"1.A"
+# define CONFIG_SYS_BOARD_REV_STR	"Rev 1.A"
 #endif
 
 /*
@@ -116,14 +116,6 @@
  */
 #define CONFIG_MEM_NVM_BASE		0x00000000
 #define CONFIG_MEM_NVM_LEN		(1024 * 1024 * 2)
-#define CONFIG_MEM_NVM_BASE		0x00000000
-#define CONFIG_MEM_NVM_LEN		(1024 * 1024 * 2)
-#define CONFIG_ENVM			1
-#if defined(CONFIG_ENVM)
-# define CONFIG_SYS_ENVM_BASE		0x08000000
-# define CONFIG_SYS_ENVM_LEN		CONFIG_MEM_NVM_LEN
-#endif
-
 
 #define CONFIG_MEM_RAM_BASE		0x20000000
 #define CONFIG_MEM_RAM_LEN		(20 * 1024)
@@ -216,18 +208,9 @@
 /*
  * Store env in Flash memory
  */
-#if 0
-# define CONFIG_ENV_IS_IN_ENVM
-#else
-# define CONFIG_ENV_IS_IN_FLASH
-#endif
+#define CONFIG_ENV_IS_IN_FLASH
 #define CONFIG_ENV_SIZE			(4 * 1024)
-#if defined(CONFIG_ENV_IS_IN_ENVM)
-# define CONFIG_ENV_ADDR 		\
-	(CONFIG_SYS_ENVM_BASE + (128 * 1024))
-#else
-# define CONFIG_ENV_ADDR		CONFIG_SYS_FLASH_BANK1_BASE
-#endif
+#define CONFIG_ENV_ADDR			CONFIG_SYS_FLASH_BANK1_BASE
 #define CONFIG_INFERNO			1
 #define CONFIG_ENV_OVERWRITE		1
 
@@ -312,59 +295,6 @@
 #define CONFIG_MONITOR_IS_IN_RAM	1
 
 /*
- * Framebuffer configuration
- */
-#define CONFIG_LCD
-
-#ifdef CONFIG_LCD
-
-#define CONFIG_DMAMEM_TAG
-#if defined(CONFIG_DMAMEM_TAG)
-/* Memory for framebuffer: 32-bit 480x272 */
-#define CONFIG_DMAMEM_SZ_ALL	0x80000
-#define CONFIG_DMAMEM_SZ_FB	CONFIG_DMAMEM_SZ_ALL
-#define CONFIG_DMAMEM_BASE	(CONFIG_SYS_RAM_BASE + \
-				(CONFIG_SYS_RAM_SIZE / 2) - \
-				CONFIG_DMAMEM_SZ_ALL)
-
-#define CONFIG_FB_ADDR		CONFIG_DMAMEM_BASE
-#endif /* CONFIG_DMAMEM_TAG */
-
-#define CONFIG_VIDEO_STM32F4_LTDC
-#define CONFIG_STM32_LTDC_PIXCLK	(9 * 1000 * 1000)
-#define LCD_EMCRAFT_IOT_LCD
-
-#define CONFIG_SPLASH_SCREEN
-#define CONFIG_SPLASH_SCREEN_ALIGN
-
-#define CONFIG_MTD_SPLASH_PART_START	0x40000
-#define CONFIG_MTD_SPLASH_PART_LEN	0x80000
-
-#define CONFIG_BMP
-#undef CONFIG_CMD_BMP
-#define CONFIG_BMP_24BPP
-#define LCD_BPP		LCD_COLOR32
-
-#ifdef LCD_EMCRAFT_IOT_LCD
-# define CONFIG_STM32F4_LTDC_XRES	480
-# define CONFIG_STM32F4_LTDC_YRES	272
-# define CONFIG_STM32F4_LTDC_BPP	LCD_BPP
-
-# define CONFIG_STM32F4_LTDC_LEFT_MARGIN	2
-# define CONFIG_STM32F4_LTDC_HSYNC_LEN		41
-# define CONFIG_STM32F4_LTDC_RIGHT_MARGIN	2
-
-# define CONFIG_STM32F4_LTDC_UPPER_MARGIN	2
-# define CONFIG_STM32F4_LTDC_VSYNC_LEN		10
-# define CONFIG_STM32F4_LTDC_LOWER_MARGIN	2
-
-#elif defined(CONFIG_VIDEO_STM32F4_LTDC)
-# error "STM32F4x9 LTDC is enabled but no LCD configured"
-#endif
-
-#endif /* CONFIG_LCD */
-
-/*
  * Enable all those monitor commands that are needed
  */
 #include <config_cmd_default.h>
@@ -413,10 +343,7 @@
 
 # define LOADADDR		"0xC0007FC0"
 
-# define REV_EXTRA_ENV							\
-	"envmboot=run addip;bootm ${envmaddr}\0"			\
-	"envmupdate=tftp ${image};"					\
-		"cptf ${envmaddr} ${loadaddr} ${filesize}\0"		\
+# define REV_EXTRA_ENV		\
 	"flashboot=run addip;"						\
 		"stmbufcopy ${loadaddr} ${flashaddr} ${kernelsize};"	\
 		"bootm ${loadaddr}\0"					\
@@ -453,7 +380,6 @@
 	"loadaddr=" LOADADDR "\0"				\
 	"addip=setenv bootargs ${bootargs} ip=${ipaddr}:${serverip}:${gatewayip}:${netmask}:${hostname}:eth0:off\0"				\
 	"flashaddr=64020000\0"					\
-	"envmaddr=08040000\0"					\
 	"ethaddr=C0:B1:3C:88:88:85\0"				\
 	"ipaddr=172.17.4.206\0"					\
 	"serverip=172.17.0.1\0"					\

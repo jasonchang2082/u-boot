@@ -35,8 +35,7 @@ DECLARE_GLOBAL_DATA_PTR;
     defined (CONFIG_SERIAL_TAG) || \
     defined (CONFIG_REVISION_TAG) || \
     defined (CONFIG_VFD) || \
-    defined (CONFIG_LCD) || \
-    defined (CONFIG_DMAMEM_TAG)
+    defined (CONFIG_LCD)
 static void setup_start_tag (bd_t *bd);
 
 # ifdef CONFIG_SETUP_MEMORY_TAGS
@@ -50,12 +49,8 @@ static void setup_initrd_tag (bd_t *bd, ulong initrd_start,
 # endif
 static void setup_end_tag (bd_t *bd);
 
-# if defined (CONFIG_SETUP_VIDEOLFB_TAG) && (defined (CONFIG_VFD) || defined (CONFIG_LCD))
+# if defined (CONFIG_VFD) || defined (CONFIG_LCD)
 static void setup_videolfb_tag (gd_t *gd);
-# endif
-
-# ifdef CONFIG_DMAMEM_TAG
-static void setup_dmamem_tag (void);
 # endif
 
 static struct tag *params;
@@ -94,8 +89,7 @@ int do_bootm_linux(int flag, int argc, char *argv[], bootm_headers_t *images)
     defined (CONFIG_SERIAL_TAG) || \
     defined (CONFIG_REVISION_TAG) || \
     defined (CONFIG_LCD) || \
-    defined (CONFIG_VFD) || \
-    defined (CONFIG_DMAMEM_TAG)
+    defined (CONFIG_VFD)
 	setup_start_tag (bd);
 #ifdef CONFIG_SERIAL_TAG
 	setup_serial_tag (&params);
@@ -113,11 +107,8 @@ int do_bootm_linux(int flag, int argc, char *argv[], bootm_headers_t *images)
 	if (images->rd_start && images->rd_end)
 		setup_initrd_tag (bd, images->rd_start, images->rd_end);
 #endif
-#if defined (CONFIG_SETUP_VIDEOLFB_TAG) && (defined (CONFIG_VFD) || defined (CONFIG_LCD))
+#if defined (CONFIG_VFD) || defined (CONFIG_LCD)
 	setup_videolfb_tag ((gd_t *) gd);
-#endif
-#ifdef CONFIG_DMAMEM_TAG
-	setup_dmamem_tag();
 #endif
 	setup_end_tag (bd);
 #endif
@@ -240,7 +231,7 @@ static void setup_initrd_tag (bd_t *bd, ulong initrd_start, ulong initrd_end)
 #endif /* CONFIG_INITRD_TAG */
 
 
-#if defined (CONFIG_SETUP_VIDEOLFB_TAG) && (defined (CONFIG_VFD) || defined (CONFIG_LCD))
+#if defined (CONFIG_VFD) || defined (CONFIG_LCD)
 extern ulong calc_fbsize (void);
 static void setup_videolfb_tag (gd_t *gd)
 {
@@ -293,18 +284,6 @@ void setup_revision_tag(struct tag **in_params)
 	params = tag_next (params);
 }
 #endif  /* CONFIG_REVISION_TAG */
-
-#ifdef CONFIG_DMAMEM_TAG
-void setup_dmamem_tag (void)
-{
-	params->hdr.tag = ATAG_DMAMEM;
-	params->hdr.size = tag_size(tag_dmamem);
-	params->u.dmamem.base = CONFIG_DMAMEM_BASE;
-	params->u.dmamem.sz_all = CONFIG_DMAMEM_SZ_ALL;
-	params->u.dmamem.sz_fb = CONFIG_DMAMEM_SZ_FB;
-	params = tag_next(params);
-}
-#endif
 
 
 static void setup_end_tag (bd_t *bd)

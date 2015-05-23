@@ -34,9 +34,7 @@ enum stm32f2_gpio_port {
 	STM32F2_GPIO_PORT_F,
 	STM32F2_GPIO_PORT_G,
 	STM32F2_GPIO_PORT_H,
-	STM32F2_GPIO_PORT_I,
-	STM32F2_GPIO_PORT_J,
-	STM32F2_GPIO_PORT_K
+	STM32F2_GPIO_PORT_I
 };
 
 /*
@@ -73,7 +71,6 @@ enum stm32f2_gpio_role {
 	STM32F2_GPIO_ROLE_USART6,	/* USART6			      */
 	STM32F2_GPIO_ROLE_ETHERNET,	/* MAC				      */
 	STM32F2_GPIO_ROLE_MCO,		/* MC external output clock	      */
-	STM32F2_GPIO_ROLE_LTDC,		/* LCD controller		      */
 	STM32F2_GPIO_ROLE_FSMC,		/* FSMC static memory controller      */
 	STM32F2_GPIO_ROLE_FMC = STM32F2_GPIO_ROLE_FSMC,
 	STM32F2_GPIO_ROLE_GPOUT,	/* GPOUT			      */
